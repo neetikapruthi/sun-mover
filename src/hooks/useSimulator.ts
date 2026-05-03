@@ -12,6 +12,7 @@ import {
   sunPositionToVector,
 } from '../utils/solarPosition';
 import type { SunVector } from '../utils/types';
+import demoImage from '../assets/hero.png';
 
 const DEFAULT_LAT = -33.63616225301599;
 const DEFAULT_LON = 150.88795248315762;
@@ -33,6 +34,14 @@ function newId() {
   return `obj-${++idCounter}`;
 }
 
+/** Compute initial solar-noon time for the default date+location */
+function getInitialSimulatedTime(): Date {
+  const d = new Date(getTodayISO() + 'T12:00:00Z');
+  const ss = getSunriseSunset(d, DEFAULT_LAT, DEFAULT_LON);
+  if (!ss) return d;
+  return interpolateTime(0.5, ss.sunrise, ss.sunset);
+}
+
 export function useSimulator() {
   const [state, setState] = useState<SimulatorState>({
     lat: DEFAULT_LAT,
@@ -40,8 +49,8 @@ export function useSimulator() {
     date: getTodayISO(),
     timezone: getBrowserTimezone(),
     timeFraction: 0.5,
-    simulatedTime: new Date(),
-    uploadedImage: null,
+    simulatedTime: getInitialSimulatedTime(),
+    uploadedImage: demoImage,
     northAngle: 0,
     shadowOpacity: 0.65,
     speed: 1,

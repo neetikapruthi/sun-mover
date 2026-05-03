@@ -4,6 +4,7 @@
 
 import { useRef, useCallback } from 'react';
 import type { SimulatorHook } from '../hooks/useSimulator';
+import demoImage from '../assets/hero.png';
 
 interface ControlPanelProps {
   sim: SimulatorHook;
@@ -41,6 +42,8 @@ export function ControlPanel({ sim, onScreenshot }: ControlPanelProps) {
     [setUploadedImage],
   );
 
+  const isDemo = state.uploadedImage === demoImage;
+
   return (
     <div className="space-y-4">
       {/* Image upload */}
@@ -61,7 +64,9 @@ export function ControlPanel({ sim, onScreenshot }: ControlPanelProps) {
                 alt="Site"
                 className="w-16 h-16 object-cover rounded"
               />
-              <span className="text-slate-400 text-xs">Click to replace</span>
+              <span className="text-slate-400 text-xs">
+                {isDemo ? 'Demo image — click to replace' : 'Click to replace'}
+              </span>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1 py-2">
@@ -82,14 +87,24 @@ export function ControlPanel({ sim, onScreenshot }: ControlPanelProps) {
           onChange={handleFileChange}
           className="hidden"
         />
-        {state.uploadedImage && (
-          <button
-            onClick={() => setUploadedImage(null)}
-            className="text-slate-500 hover:text-red-400 text-xs transition-colors w-full text-center"
-          >
-            Remove image
-          </button>
-        )}
+        <div className="flex gap-2">
+          {!isDemo && (
+            <button
+              onClick={() => setUploadedImage(demoImage)}
+              className="flex-1 text-slate-500 hover:text-amber-400 text-xs transition-colors text-center"
+            >
+              Load demo image
+            </button>
+          )}
+          {state.uploadedImage && !isDemo && (
+            <button
+              onClick={() => setUploadedImage(null)}
+              className="flex-1 text-slate-500 hover:text-red-400 text-xs transition-colors text-center"
+            >
+              Remove image
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Shadow opacity */}
@@ -132,7 +147,7 @@ export function ControlPanel({ sim, onScreenshot }: ControlPanelProps) {
             Sun-Hours Heatmap
           </span>
           <span className="text-slate-600 text-xs">
-            {state.showHeatmap ? 'Computing...' : 'Shows daily exposure'}
+            {state.showHeatmap ? 'Showing daily exposure' : 'Shows daily exposure'}
           </span>
         </div>
         <button

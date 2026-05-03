@@ -181,12 +181,16 @@ See [`docs/solar-math.md`](docs/solar-math.md) for a full explanation of:
 # Install gh-pages
 npm install -D gh-pages
 
-# Add to package.json scripts:
-# "deploy": "gh-pages -d dist"
+# Build with the repo name as base path
+VITE_BASE=/sun-mover/ npm run build
 
-npm run build
+# Deploy (add to package.json scripts first):
+# "deploy": "gh-pages -d dist"
 npm run deploy
 ```
+
+> The `VITE_BASE` env variable sets the Vite `base` path for GitHub Pages.  
+> Without it, the default is `/` (correct for Vercel/Netlify).
 
 ### Vercel
 
@@ -194,6 +198,8 @@ npm run deploy
 npm install -g vercel
 vercel --prod
 ```
+
+No base path override needed — Vercel serves from `/`.
 
 ### Netlify
 

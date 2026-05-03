@@ -6,13 +6,9 @@
  */
 
 import { useMemo } from 'react';
-import { extend } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { SunVector } from '../utils/types';
 import { getSunPath, sunPositionToVector } from '../utils/solarPosition';
-
-// Register THREE.Line so R3F recognises <threeeLine> (avoid HTML <line> conflict)
-extend({ ThreeLine: THREE.Line });
 
 interface SunPathOverlayProps {
   lat: number;

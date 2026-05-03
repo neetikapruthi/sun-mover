@@ -36,6 +36,7 @@ export function Scene({ sim }: SceneProps) {
         outputColorSpace: THREE.SRGBColorSpace,
         toneMapping: THREE.ACESFilmicToneMapping,
         toneMappingExposure: 1.0,
+        preserveDrawingBuffer: true, // required for canvas.toDataURL() screenshot export
       }}
       style={{ width: '100%', height: '100%' }}
     >
