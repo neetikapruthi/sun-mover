@@ -89,11 +89,11 @@ export function CompassOverlay({ sim }: CompassOverlayProps) {
     ctx.stroke();
 
     // South needle (white)
-    const sx = CENTER - RADIUS * 0.4 * Math.sin(angle);
-    const sy = CENTER + RADIUS * 0.4 * Math.cos(angle);
+    const southX = CENTER - RADIUS * 0.4 * Math.sin(angle);
+    const southY = CENTER + RADIUS * 0.4 * Math.cos(angle);
     ctx.beginPath();
     ctx.moveTo(CENTER, CENTER);
-    ctx.lineTo(sx, sy);
+    ctx.lineTo(southX, southY);
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 2.5;
     ctx.lineCap = 'round';

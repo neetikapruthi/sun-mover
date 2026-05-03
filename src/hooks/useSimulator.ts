@@ -3,7 +3,7 @@
  * All simulation state lives here so components can subscribe without prop-drilling.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import type { SimulatorState, Obstacle, ObstacleKind } from '../utils/types';
 import {
   getSunriseSunset,
@@ -51,29 +51,18 @@ export function useSimulator() {
     obstacles: [],
   });
 
-  // Derived sunrise/sunset for current date+location
-  const [sunriseSunset, setSunriseSunset] = useState<{
-    sunrise: Date;
-    sunset: Date;
-  } | null>(null);
-
-  // Recompute sunrise/sunset when date or location changes
-  useEffect(() => {
+  // Derived sunrise/sunset for current date+location (computed, not stored in state)
+  const sunriseSunset = useMemo(() => {
     const d = new Date(state.date + 'T12:00:00Z');
-    const ss = getSunriseSunset(d, state.lat, state.lon);
-    setSunriseSunset(ss);
-    if (ss) {
-      const t = interpolateTime(state.timeFraction, ss.sunrise, ss.sunset);
-      setState((prev) => ({ ...prev, simulatedTime: t }));
-    }
-  }, [state.date, state.lat, state.lon]); // eslint-disable-line react-hooks/exhaustive-deps
+    return getSunriseSunset(d, state.lat, state.lon);
+  }, [state.date, state.lat, state.lon]);
 
   // Current sun vector (derived from state)
-  const sunVector: SunVector = (() => {
+  const sunVector: SunVector = useMemo(() => {
     if (!sunriseSunset) return { x: 0.3, y: 1, z: 0.3 };
     const pos = getSunPosition(state.simulatedTime, state.lat, state.lon);
     return sunPositionToVector(pos.altitude, pos.azimuth, state.northAngle);
-  })();
+  }, [sunriseSunset, state.simulatedTime, state.lat, state.lon, state.northAngle]);
 
   // Animation loop
   const animFrameRef = useRef<number | null>(null);

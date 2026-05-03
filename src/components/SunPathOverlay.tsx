@@ -6,9 +6,13 @@
  */
 
 import { useMemo } from 'react';
+import { extend } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { SunVector } from '../utils/types';
 import { getSunPath, sunPositionToVector } from '../utils/solarPosition';
+
+// Register THREE.Line so R3F recognises <threeeLine> (avoid HTML <line> conflict)
+extend({ ThreeLine: THREE.Line });
 
 interface SunPathOverlayProps {
   lat: number;
@@ -42,13 +46,18 @@ export function SunPathOverlay({
     });
   }, [lat, lon, date, northAngle]);
 
-  // Build curve geometry
-  const pathGeometry = useMemo(() => {
+  // Build a THREE.Line primitive directly (avoids JSX element naming conflicts)
+  const linePrimitive = useMemo(() => {
     if (pathPoints.length < 2) return null;
     const curve = new THREE.CatmullRomCurve3(pathPoints);
     const pts = curve.getPoints(128);
     const geo = new THREE.BufferGeometry().setFromPoints(pts);
-    return geo;
+    const mat = new THREE.LineBasicMaterial({
+      color: '#fbbf24',
+      transparent: true,
+      opacity: 0.5,
+    });
+    return new THREE.Line(geo, mat);
   }, [pathPoints]);
 
   // Current sun position in 3D
@@ -60,18 +69,8 @@ export function SunPathOverlay({
 
   return (
     <group>
-      {/* Sun path arc */}
-      {pathGeometry && (
-        <line>
-          <bufferGeometry attach="geometry" {...pathGeometry} />
-          <lineBasicMaterial
-            attach="material"
-            color="#fbbf24"
-            transparent
-            opacity={0.5}
-          />
-        </line>
-      )}
+      {/* Sun path arc rendered as a primitive to avoid JSX <line> conflicts */}
+      {linePrimitive && <primitive object={linePrimitive} />}
 
       {/* Current sun sphere */}
       <mesh position={sunPos}>
@@ -79,7 +78,7 @@ export function SunPathOverlay({
         <meshBasicMaterial color="#fde68a" />
       </mesh>
 
-      {/* Sun glow sprite (billboard) */}
+      {/* Sun glow point light */}
       <pointLight
         position={sunPos}
         color="#fde68a"
